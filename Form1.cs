@@ -67,12 +67,12 @@ namespace BulkFileParser
         {
             string filePath = string.Empty;
             string fileExt = string.Empty;
+            string fp = string.Empty;
             OpenFileDialog file = new OpenFileDialog();
-            int rpf;
-
             if (file.ShowDialog() == System.Windows.Forms.DialogResult.OK) //if there is a file choosen by the user  
             {
                 filePath = file.FileName; //get the path of the file  
+                fp = Path.GetDirectoryName(filePath);
                 fileExt = Path.GetExtension(filePath); //get the file extension  
                 if (fileExt.CompareTo(".xls") == 0 || fileExt.CompareTo(".xlsx") == 0)
                 {
@@ -83,6 +83,7 @@ namespace BulkFileParser
                         dataGridView1.Visible = true;
                         dataGridView1.DataSource = dtExcel;
                         textBox1.Text = filePath;
+                        label5.Text = fp;
                         DataRowCollection rows1 = dtExcel.Rows;
                         DataColumnCollection cols1 = dtExcel.Columns;
                         textBox3.Text = rows1.Count.ToString();
@@ -113,7 +114,9 @@ namespace BulkFileParser
 
         private void button2_Click(object sender, EventArgs e)
         {
-            
+
+            Parse(Convert.ToInt32(textBox3.Text), Convert.ToInt32(textBox5.Text), 
+                ReadExcel(textBox1.Text), label5.Text);
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
@@ -125,9 +128,24 @@ namespace BulkFileParser
             else
             {
                 int rpf = Convert.ToInt32(textBox2.Text);
-                textBox5.Text = Convert.ToString((Convert.ToInt32(textBox3.Text) / rpf));
+                textBox5.Text = Convert.ToString((Convert.ToInt32(textBox3.Text) / rpf)+1);
             }
             
+        }
+
+        private void Parse(int rowN, int fileN, DataTable dtExcel, String fp)
+        {
+            int i = 1;
+            IXLWorkbook wb1 = new XLWorkbook(textBox1.Text);
+            IXLWorksheet ws1 = wb1.Worksheet(1);
+
+            IXLWorkbook wb = new XLWorkbook();
+            IXLWorksheet ws = wb.Worksheets.Add("Sheet1");
+
+            ws1.Cell(1, 1).CopyTo(ws.Cell(1, 1));
+            wb.SaveAs(fp+ "Parsed_"+i+".xlsx");
+
+
         }
     }
 }
