@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Data.OleDb;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ClosedXML.Excel;
 
@@ -85,7 +78,7 @@ namespace BulkFileParser
                         DataRowCollection rows1 = dtExcel.Rows;
                         DataColumnCollection cols1 = dtExcel.Columns;
                         textBox3.Text = rows1.Count.ToString();
-                        textBox4.Text = Convert.ToString(cols1.Count);
+                        textBox4.Text = cols1.Count.ToString();
 
                         if (textBox2.Text == "")
                         {
@@ -105,7 +98,7 @@ namespace BulkFileParser
                 }
                 else
                 {
-                    MessageBox.Show("Please choose .xls or .xlsx file only.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Error); //custom messageBox to show error  
+                    MessageBox.Show("Please choose .xls or .xlsx file only.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Error);  
                 }
             }
         }
