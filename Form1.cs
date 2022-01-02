@@ -22,21 +22,20 @@ namespace BulkFileParser
 
         public static DataTable ReadExcel(string filePath)
         {
-            // Open the Excel file using ClosedXML.
-            // Keep in mind the Excel file cannot be open when trying to read it
+         
             using (XLWorkbook workBook = new XLWorkbook(filePath))
             {
-                //Read the first Sheet from Excel file.
+               
                 IXLWorksheet workSheet = workBook.Worksheet(1);
 
-                //Create a new DataTable.
+                
                 DataTable dt = new DataTable();
 
-                //Loop through the Worksheet rows.
+               
                 bool firstRow = true;
                 foreach (IXLRow row in workSheet.Rows())
                 {
-                    //Use the first row to add columns to DataTable.
+                   
                     if (firstRow)
                     {
                         foreach (IXLCell cell in row.Cells())
@@ -47,7 +46,6 @@ namespace BulkFileParser
                     }
                     else
                     {
-                        //Add rows to DataTable.
                         dt.Rows.Add();
                         int i = 0;
 
@@ -69,17 +67,17 @@ namespace BulkFileParser
             string fileExt = string.Empty;
             string fp = string.Empty;
             OpenFileDialog file = new OpenFileDialog();
-            if (file.ShowDialog() == System.Windows.Forms.DialogResult.OK) //if there is a file choosen by the user  
+            if (file.ShowDialog() == System.Windows.Forms.DialogResult.OK) 
             {
-                filePath = file.FileName; //get the path of the file  
+                filePath = file.FileName; 
                 fp = Path.GetDirectoryName(filePath);
-                fileExt = Path.GetExtension(filePath); //get the file extension  
+                fileExt = Path.GetExtension(filePath); 
                 if (fileExt.CompareTo(".xls") == 0 || fileExt.CompareTo(".xlsx") == 0)
                 {
                     try
                     {
                         DataTable dtExcel = new DataTable();
-                        dtExcel = ReadExcel(filePath); //read excel file  
+                        dtExcel = ReadExcel(filePath);
                         dataGridView1.Visible = true;
                         dataGridView1.DataSource = dtExcel;
                         textBox1.Text = filePath;
@@ -114,9 +112,12 @@ namespace BulkFileParser
 
         private void button2_Click(object sender, EventArgs e)
         {
-
-            Parse(Convert.ToInt32(textBox3.Text), Convert.ToInt32(textBox5.Text), 
+            progressBar1.Visible = true;
+            progressBar1.Maximum = Convert.ToInt32(textBox5.Text);
+            Parse(Convert.ToInt32(textBox2.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text), 
                 ReadExcel(textBox1.Text), label5.Text);
+            progressBar1.Visible = false;
+
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
@@ -133,19 +134,48 @@ namespace BulkFileParser
             
         }
 
-        private void Parse(int rowN, int fileN, DataTable dtExcel, String fp)
+        private void Parse(int rowN, int colN, int fileN, DataTable dtExcel, String fp)
         {
-            int i = 1;
+            
             IXLWorkbook wb1 = new XLWorkbook(textBox1.Text);
             IXLWorksheet ws1 = wb1.Worksheet(1);
-
             IXLWorkbook wb = new XLWorkbook();
             IXLWorksheet ws = wb.Worksheets.Add("Sheet1");
+            ws.Clear((XLClearOptions)11);
+            int n;     
+            int lRow;
 
-            ws1.Cell(1, 1).CopyTo(ws.Cell(1, 1));
-            wb.SaveAs(fp+ "Parsed_"+i+".xlsx");
+            if (checkBox1.Checked)
+            {
+                lRow = rowN + 1;
+                n = 2;
+            }
+            else
+            {
+                lRow = rowN;
+                n = 1;
+            }
+            int fRow = n;
 
+            for (int i = 1; i <= fileN; i++)
+            {
+                if (checkBox1.Checked)
+                    ws1.Range(ws1.Cell(1, 1), ws1.Cell(1, colN)).CopyTo(ws.Range("A1"));
+                   
+                
+                ws1.Range(ws1.Cell(fRow, 1), ws1.Cell(lRow, colN)).CopyTo(ws.Range("A"+n));
+                
+                    
+                wb.SaveAs(fp + "\\Parsed_" + i + ".xlsx");
+                fRow = lRow + 1;
+                lRow = rowN+ lRow;
+                progressBar1.Increment(1);
 
+            }
+            
         }
+        
+
+        
     }
 }
